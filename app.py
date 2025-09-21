@@ -1,74 +1,189 @@
-# app.py (Free Gemini API Version)
+# app.py (LexiGuide - Legal Theme Deep Brown + Beige)
 
 import streamlit as st
 import google.generativeai as genai
 import PyPDF2
 from io import BytesIO
 
-# --- Configure the Gemini API ---
+# --- Configure Gemini API ---
 try:
-    # Get the API key from Streamlit's secrets
     api_key = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=api_key)
-    # Load the Gemini 1.0 Pro model
-    # New Code
     model = genai.GenerativeModel("gemini-1.5-flash-latest")
     st.session_state.ai_initialized = True
 except Exception as e:
-    st.error(f"Error configuring the AI model: {e}")
-    st.error("Please make sure you have a GOOGLE_API_KEY in your .streamlit/secrets.toml file.")
+    st.error(f"Error configuring AI: {e}")
     st.session_state.ai_initialized = False
 
 # --- Core AI Function ---
 def get_ai_response(prompt_text, document_text):
-    """
-    Sends a prompt and the document text to the Gemini model
-    and returns the model's response.
-    """
     if not st.session_state.ai_initialized:
-        return "AI model is not available. Please check your API key configuration."
-
-    # The complete prompt includes the instruction and the document context
-    full_prompt = f"""
-    {prompt_text}
-
-    Here is the legal document text:
-    ---
-    {document_text}
-    ---
-    """
+        return "AI model not available. Check API key."
+    full_prompt = f"{prompt_text}\n\nDocument Text:\n{document_text}"
     try:
         response = model.generate_content(full_prompt)
         return response.text
     except Exception as e:
-        # Provide a more user-friendly error message
-        st.error(f"An error occurred while communicating with the AI. Please check your API key and network connection. Details: {e}")
+        st.error(f"Error communicating with AI: {e}")
         return None
 
-
-# --- Helper Function for PDF Text Extraction ---
+# --- PDF Text Extraction ---
 def extract_text_from_pdf(pdf_file):
-    """
-    Extracts text from an uploaded PDF file.
-    """
     text = ""
     try:
         pdf_reader = PyPDF2.PdfReader(BytesIO(pdf_file.read()))
         for page in pdf_reader.pages:
             text += page.extract_text() or ""
     except Exception as e:
-        st.error(f"Error reading PDF file: {e}")
+        st.error(f"Error reading PDF: {e}")
         return None
     return text
 
-# --- Streamlit UI (This is the NEW, updated section) ---
+# --- Page Config ---
+st.set_page_config(page_title="LexiGuide", page_icon="⚖", layout="wide")
 
-st.set_page_config(page_title="LexiGuide", page_icon="⚖️", layout="wide")
+# --- Dark Brown + Beige Theme + Subtle Blobs ---
+# --- CSS & Background ---
+# --- CSS & Background ---
+st.markdown("""
+<style>
+/* Background */
+[data-testid="stAppViewContainer"] {
+    background: #493628;
+    color: #F5F5DC;
+    font-family: 'Lora', serif;
+}
 
-st.title("⚖️ LexiGuide: Demystify Your Legal Documents")
-st.warning("Disclaimer: This is an AI-powered tool and not a substitute for professional legal advice. Always consult with a qualified attorney for legal matters.", icon="⚠️")
+/* Headings */
+h1, h2, h3 {
+    font-family: 'Merriweather', serif;
+    letter-spacing: 0.5px;
+}
+h1 { font-size: 3rem; color: #FFFFFF; font-weight: 700; }
+h2 { color: #D2B48C; }
+h3 { color: #F5F5DC; }
 
-# Initialize session state for all variables
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #1C1C1C !important;
+    color: #F5F5DC !important;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Buttons */
+.stButton>button {
+    background-color: #5A3E2B !important; /* rich brown */
+    color: #FFFFFF !important;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    font-family: 'Lato', sans-serif;
+}
+.stButton>button:hover {
+    background-color: #7B4F39 !important;
+    box-shadow: 0 0 10px rgba(210,180,140,0.6);
+}
+
+/* Inputs */
+textarea, input[type=text] {
+    background-color: #2A2A2A !important;
+    color: #F5F5DC !important;
+    border-radius: 6px;
+    font-family: 'Lato', sans-serif;
+}
+
+/* AI response cards */
+.ai-card {
+    background-color: #1F1F1F;
+    color: #F5F5DC;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    font-family: 'Lato', sans-serif;
+}
+
+/* Info/Feature Boxes */
+.info-box {
+    background-color: #2A2A2A;
+    color: #F5F5DC;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 15px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease;
+}
+.info-box:hover { transform: translateY(-3px); }
+
+/* Footer */
+footer {
+    font-size: 11px !important;
+    color: #D2B48C !important;
+    font-family: 'Lato', sans-serif;
+}
+
+/* Sleek Shapes */
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.06;
+    background: #D2B48C;
+    animation: float 14s ease-in-out infinite;
+}
+.shape1 { width: 160px; height: 160px; top: 80px; left: 12%; }
+.shape2 { width: 120px; height: 120px; top: 400px; left: 75%; }
+.shape3 { width: 200px; height: 200px; top: 650px; left: 35%; }
+.shape4 { width: 100px; height: 100px; top: 950px; left: 15%; }
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-25px); }
+    100% { transform: translateY(0px); }
+}
+</style>
+
+<div class="shape shape1"></div>
+<div class="shape shape2"></div>
+<div class="shape shape3"></div>
+<div class="shape shape4"></div>
+""", unsafe_allow_html=True)
+
+# --- Hero Section ---
+st.markdown("""
+<div style="text-align: center; padding: 4rem 0; background: url('https://upload.wikimedia.org/wikipedia/commons/d/d0/Corinthian_columns_interior.jpg') no-repeat center; background-size: cover; border-bottom: 2px solid #D2B48C;">
+    <div style="background: #AB886D; padding: 2rem; border-radius: 12px; display: inline-block; max-width: 800px;">
+        <h1>Clarity in Law. Confidence in Action.</h1>
+        <h2 style="color:#F5F5DC;">AI-Powered Legal Insights for Business Protection</h2>
+        <p style="max-width:650px; margin:auto; color:#e5dfcc; font-size:1.1rem; line-height:1.6;">
+            LexiGuide transforms complex contracts into clear guidance. From risk analysis to clause detection, 
+            we simplify the law so you can focus on strategy.
+        </p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# --- Example Info Boxes ---
+st.markdown("""
+<div style="display: flex; gap: 20px; justify-content: center; margin-top: 2rem;">
+    <div class="info-box" style="flex:1; text-align:center;">
+        <h3>📜 Contract Summaries</h3>
+        <p>Plain-language summaries for instant clarity.</p>
+    </div>
+    <div class="info-box" style="flex:1; text-align:center;">
+        <h3>🔑 Key Clauses</h3>
+        <p>Spot crucial obligations, risks, and protections.</p>
+    </div>
+    <div class="info-box" style="flex:1; text-align:center;">
+        <h3>💬 Legal Q&A</h3>
+        <p>Ask questions and get AI-powered document answers.</p>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+
+# --- Session State ---
 if 'document_text' not in st.session_state:
     st.session_state.document_text = ""
 if 'summary_analysis' not in st.session_state:
@@ -76,97 +191,73 @@ if 'summary_analysis' not in st.session_state:
 if 'clauses_analysis' not in st.session_state:
     st.session_state.clauses_analysis = None
 
-
+# --- Sidebar ---
 with st.sidebar:
-    st.header("Upload Your Document")
-    st.markdown("Upload a PDF or paste the text directly.")
-
-    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
-    pasted_text = st.text_area("Or paste text here", height=200)
-
-    if st.button("Process Document", use_container_width=True):
-        with st.spinner("Processing..."):
-            # When a new document is processed, clear old results
+    st.markdown("## 📂 Upload Document")
+    uploaded_file = st.file_uploader("", type="pdf")
+    pasted_text = st.text_area("Or paste text here", height=150, placeholder="Paste your contract or agreement...")
+    st.markdown("---")
+    if st.button("⚡ Process Document", use_container_width=True):
+        with st.spinner("Processing document..."):
             st.session_state.summary_analysis = None
             st.session_state.clauses_analysis = None
-            
             if uploaded_file:
                 st.session_state.document_text = extract_text_from_pdf(uploaded_file)
             elif pasted_text:
                 st.session_state.document_text = pasted_text
             else:
-                st.error("Please upload a file or paste text.")
+                st.error("Please upload a PDF or paste text.")
 
-
+# --- Main Area ---
 if st.session_state.document_text and st.session_state.ai_initialized:
-    st.success("Document processed! Select a tab below to see the analysis.")
+    st.success("✅ Document processed! Choose a tab below.")
 
-    # Create tabs for different analyses
-    summary_tab, clauses_tab, qa_tab = st.tabs(["📜 Summary & Risks", "🔑 Key Clauses", "💬 Ask a Question (Q&A)"])
+    summary_tab, clauses_tab, qa_tab = st.tabs(
+        ["📜 Summary & Risks", "🔑 Key Clauses", "💬 Ask Me Anything"]
+    )
 
     with summary_tab:
-        # This analysis runs automatically if it hasn't been run before
         if not st.session_state.summary_analysis:
-            with st.spinner("Generating summary and risk analysis..."):
+            with st.spinner("Generating summary & risk analysis..."):
                 prompt = """
-                You are an expert legal analyst. Your task is to provide a two-part analysis of the legal document below.
-
-                **Part 1: Simple Summary**
-                First, write a concise, plain-English summary of the document. Explain its main purpose and what it means for the person signing it.
-
-                **Part 2: Traffic Light Clause Analysis**
-                After the summary, categorize the key clauses into a "Traffic Light" system. For each clause, provide a title and a simple one-sentence explanation.
-
-                ---
-
-                ### 🔴 Red Light Clauses (Risks & Dangers)
-                List all clauses that represent significant risks, penalties, liabilities, restrictions, or unfavorable terms. These are critical "must-know" items.
-
-                ### 🟡 Yellow Light Clauses (Caution & Obligations)
-                List all clauses that require specific attention, outline the user's duties and obligations, or detail important procedures like renewals or termination notices.
-
-                ### 🟢 Green Light Clauses (Favorable & Standard)
-                List all clauses that are standard, benign, or that outline the user's rights and the services they will receive.
+                Provide a two-part analysis:
+                Part 1: Simple summary in plain English.
+                Part 2: Traffic light clause analysis:
+                  🔴 Red (Risks)
+                  🟡 Yellow (Obligations)
+                  🟢 Green (Favorable)
                 """
                 st.session_state.summary_analysis = get_ai_response(prompt, st.session_state.document_text)
-
-        # Always display the result from session state
-        st.markdown(st.session_state.summary_analysis)
+        st.markdown(f"<div class='ai-card'>{st.session_state.summary_analysis}</div>", unsafe_allow_html=True)
 
     with clauses_tab:
-        # This analysis runs automatically as well
         if not st.session_state.clauses_analysis:
             with st.spinner("Extracting key clauses..."):
                 prompt = """
-                You are an expert legal analyst. Your task is to identify and explain the key clauses
-                in the provided legal document. For each key clause, provide:
-                1. The Clause Title (e.g., "Term of Agreement", "Confidentiality", "Termination").
-                2. A simple, one-sentence explanation of what the clause means for the user.
-                Format the output clearly with headings for each clause.
+                Identify and explain key clauses:
+                1. Clause title
+                2. One-sentence explanation
                 """
                 st.session_state.clauses_analysis = get_ai_response(prompt, st.session_state.document_text)
-
-        # Always display the result from session state
-        st.markdown(st.session_state.clauses_analysis)
+        st.markdown(f"<div class='ai-card'>{st.session_state.clauses_analysis}</div>", unsafe_allow_html=True)
 
     with qa_tab:
-        # The Q&A tab remains interactive, so it still needs a button
-        st.subheader("Ask Questions About Your Document")
-        user_question = st.text_input("Enter your question here:")
-        if st.button("Get Answer", key="qa_btn"):
-            if user_question:
-                prompt = f'''
-                You are a legal Q&A assistant. You must answer the user's question based *only* on the
-                information available in the provided legal document. Do not make assumptions or use
-                external knowledge. If the answer is not in the document, state that clearly.
+        st.subheader("💬 Ask Questions About Your Document")
+        user_question = st.chat_input("Type your question here...")
+        if user_question:
+            with st.spinner("Thinking..."):
+                prompt = f"""
+                Answer based ONLY on the document.
+                If not found, say 'The document does not mention this.'
+                User Question: {user_question}
+                """
+                answer = get_ai_response(prompt, st.session_state.document_text)
+            if answer:
+                with st.chat_message("assistant"):
+                    st.markdown(f"<div class='ai-card'>{answer}</div>", unsafe_allow_html=True)
 
-                User's Question: "{user_question}"
-                '''
-                with st.spinner("Finding answer..."):
-                    answer = get_ai_response(prompt, st.session_state.document_text)
-                    if answer:
-                        st.markdown(answer)
-            else:
-                st.warning("Please enter a question.")
 else:
-    st.info("Upload or paste a document on the left to get started.")
+    st.info("📥 Upload or paste a document on the left to get started.")
+
+# --- Footer ---
+st.markdown("<hr><p style='text-align:center; font-size:10px;'>⚖ LexiGuide | Built with Streamlit + Google Gemini API</p>", unsafe_allow_html=True)
