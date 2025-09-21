@@ -1,9 +1,8 @@
-# app.py (LexiGuide - Legal Theme Deep Brown + Beige)
-
 import streamlit as st
 import google.generativeai as genai
 import PyPDF2
 from io import BytesIO
+import base64
 
 # --- Configure Gemini API ---
 try:
@@ -42,14 +41,19 @@ def extract_text_from_pdf(pdf_file):
 # --- Page Config ---
 st.set_page_config(page_title="LexiGuide", page_icon="⚖", layout="wide")
 
-# --- Dark Brown + Beige Theme + Subtle Blobs ---
-# --- CSS & Background ---
+# --- image bg ---
+def get_base64_img(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+img_base64 = get_base64_img("assets/bg.png")  
+
 # --- CSS & Background ---
 st.markdown("""
 <style>
 /* Background */
 [data-testid="stAppViewContainer"] {
-    background: #493628;
+    background: #412f26;
     color: #F5F5DC;
     font-family: 'Lora', serif;
 }
@@ -106,7 +110,7 @@ textarea, input[type=text] {
 
 /* Info/Feature Boxes */
 .info-box {
-    background-color: #2A2A2A;
+    background-color:#412f26 ;
     color: #F5F5DC;
     padding: 20px;
     border-radius: 12px;
@@ -128,7 +132,7 @@ footer {
     position: absolute;
     border-radius: 50%;
     opacity: 0.06;
-    background: #D2B48C;
+    background: #D6C0B3;
     animation: float 14s ease-in-out infinite;
 }
 .shape1 { width: 160px; height: 160px; top: 80px; left: 12%; }
@@ -150,19 +154,27 @@ footer {
 """, unsafe_allow_html=True)
 
 # --- Hero Section ---
-st.markdown("""
-<div style="text-align: center; padding: 4rem 0; background: url('https://upload.wikimedia.org/wikipedia/commons/d/d0/Corinthian_columns_interior.jpg') no-repeat center; background-size: cover; border-bottom: 2px solid #D2B48C;">
-    <div style="background: #AB886D; padding: 2rem; border-radius: 12px; display: inline-block; max-width: 800px;">
-        <h1>Clarity in Law. Confidence in Action.</h1>
-        <h2 style="color:#F5F5DC;">AI-Powered Legal Insights for Business Protection</h2>
-        <p style="max-width:650px; margin:auto; color:#e5dfcc; font-size:1.1rem; line-height:1.6;">
-            LexiGuide transforms complex contracts into clear guidance. From risk analysis to clause detection, 
-            we simplify the law so you can focus on strategy.
-        </p>
-    </div>
+st.markdown(f"""
+<div style="
+    text-align: center;
+    padding: 2rem 0;
+    max-width: 850px;
+    margin:auto;
+    background: linear-gradient(rgba(117, 82, 64, 0.9), rgba(117, 82, 64, 0.9)), 
+                url('data:image/png;base64,{img_base64}') no-repeat center;
+    background-size: cover;
+    border-radius: 20px;
+    color: #E4E0E1;
+    border-bottom: 4px solid #D2B48C
+">
+    <h1>Clarity in Law. Confidence in Action.</h1>
+    <h2 style='color:#F5F5DC;'>AI-Powered Legal Insights for Business Protection</h2>
+    <p style="max-width:650px; margin:auto; color:#e5dfcc; font-size:1.1rem; line-height:1.6;">
+        LexiGuide transforms complex contracts into clear guidance. From risk analysis to clause detection, 
+        we simplify the law so you can focus on strategy.
+    </p>
 </div>
 """, unsafe_allow_html=True)
-
 # --- Example Info Boxes ---
 st.markdown("""
 <div style="display: flex; gap: 20px; justify-content: center; margin-top: 2rem;">
